@@ -2,7 +2,7 @@
 
 # PanchangaAPI
 
-**Vedic Astrology API & MCP Server -- 22 tools, 5 prompts, 3 resources | Swiss Ephemeris precision**
+**Vedic Astrology API & MCP Server -- 24 tools, 5 prompts, 3 resources | Swiss Ephemeris precision**
 
 The most accurate and complete Vedic astrology (Jyotish) API available. Purpose-built for AI agents, developers, and astro-applications. Swiss Ephemeris engine with Lahiri ayanamsha, sidereal zodiac, and true planetary positions.
 
@@ -47,9 +47,9 @@ curl -X POST https://api.moon-bot.cc/panchanga \
 
 ## MCP Server Capabilities
 
-PanchangaAPI is a full-featured MCP server with **22 tools**, **5 prompt templates**, and **3 resources**.
+PanchangaAPI is a full-featured MCP server with **24 tools**, **5 prompt templates**, and **3 resources**.
 
-### Tools (22)
+### Tools (24)
 
 | Tool Name | Description | Credits |
 |-----------|-------------|---------|
@@ -74,6 +74,8 @@ PanchangaAPI is a full-featured MCP server with **22 tools**, **5 prompt templat
 | `data.vrata` | Vrata (fasting) calendar -- Ekadashi, Pradosham, Chaturthi, Amavasya | 5 |
 | `data.vrata_month` | Monthly Vrata calendar | 1 |
 | `analysis.remedies` | Personalized remedies -- gemstones, mantras, rituals based on chart | 3 |
+| `analysis.pancha_pakshi` | Pancha Pakshi (Five Birds) timing system for activity planning | 2 |
+| `account.webhook_subscribe` | Subscribe to webhook notifications for account events | free |
 | `account.register` | Register for an API key (free, email, or Telegram verification) | free |
 
 ### Prompts (5)
