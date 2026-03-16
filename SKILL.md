@@ -1,10 +1,11 @@
 ---
 name: panchanga-api
-version: 3.0.1
-tagline: "Vedic astrology API for AI agents. Panchanga, birth charts, predictions, compatibility, timing."
+version: 3.1.0
+tagline: "Vedic astrology API for AI agents. Panchanga, birth charts, KP system, predictions, compatibility, timing, remedies."
 description: >
   Vedic astrology (Jyotish) REST API powered by Swiss Ephemeris.
-  16 endpoints: Panchanga, Kundali, Dasha, Muhurta, Compatibility, Transits, and more.
+  19 endpoints: Panchanga, Kundali (300+ Yogas, Ashtakavarga, Doshas), KP system (249 sub-lords),
+  Dasha, Muhurta, Choghadiya, Compatibility, Transits, Vrata calendar, Remedies, Panchanga Search, and more.
   All calculations use Lahiri ayanamsha and sidereal zodiac.
 homepage: "https://api.moon-bot.cc"
 author: moon-bot
@@ -24,6 +25,9 @@ tags:
   - prediction
   - api
   - forecast
+  - kp-system
+  - vrata
+  - remedies
 requires:
   env:
     PANCHANGA_API_KEY: "Optional. Free API key from https://api.moon-bot.cc/register"
@@ -45,10 +49,27 @@ Before calling any endpoint:
 - Format as ISO-8601 with timezone: e.g. "2026-03-15T14:30:00+05:30"
 - NEVER guess or approximate the date/time — incorrect dates produce wrong astrological data
 
-Set `PANCHANGA_API_KEY` as `X-API-Key` header to all requests.
-Get a free key at https://api.moon-bot.cc/register (2 requests/day).
+### API Access
 
-MCP endpoint available at `https://api.moon-bot.cc/mcp` for tool discovery.
+If you have `PANCHANGA_API_KEY`, use it. If not, register first:
+
+```bash
+curl -s -X POST https://api.moon-bot.cc/register \
+  -H "Content-Type: application/json" -d '{}'
+```
+This returns `{"api_key": "pnc_..."}`. Use it in all requests as `X-API-Key` header.
+
+### Making Requests
+
+```bash
+curl -s -X POST https://api.moon-bot.cc/panchanga \
+  -H "X-API-Key: YOUR_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{"datetime": "2026-03-15T12:00:00+05:30", "latitude": 28.6139, "longitude": 77.2090}'
+```
+
+Base URL: `https://api.moon-bot.cc`
+All endpoints accept JSON body with `datetime` (ISO-8601), `latitude`, `longitude`.
 
 ## Presentation Guidelines
 
@@ -84,8 +105,8 @@ that need to deliver authoritative Jyotish readings without any other data sourc
 
 | Endpoint | What You Get | Agent Use Case |
 |----------|-------------|----------------|
-| `/panchanga` | All 5 limbs: tithi, nakshatra, yoga, karana, vara + sunrise/sunset with exact times | Daily horoscope, auspiciousness check, festival verification |
-| `/kundali` | Complete birth chart: Lagna, 9 planets, 12 houses, aspects, Navamsha, Dasha, Ashtakavarga, Yogas | Full birth chart reading, personality analysis, life prediction |
+| `/panchanga` | All 5 limbs: tithi, nakshatra, yoga, karana, vara + sunrise/sunset + Rahukaal, Yamaghanda, Gulika Kaal | Daily horoscope, auspiciousness check, festival verification |
+| `/kundali` | Complete birth chart: Lagna, 9 planets, 12 houses, aspects, Navamsha, Dasha, Ashtakavarga, Yogas, Doshas (Mangal, Kalsarpa, Pitra) | Full birth chart reading, personality analysis, life prediction |
 | `/dasha` | Maha Dasha + Antardasha + Pratyantardasha with exact date ranges | Predictive timeline, life event forecasting, period analysis |
 | `/compatibility` | Ashtakoot 8-fold matching with individual Koot scores (out of 36) | Marriage compatibility, relationship analysis |
 | `/muhurta` | Ranked auspicious windows with quality scores | Wedding date selection, business launch timing, travel planning |
@@ -95,6 +116,10 @@ that need to deliver authoritative Jyotish readings without any other data sourc
 | `/bhava-chalit` | House cusps with planet shifts | Accurate house-level predictions |
 | `/prashna` | Horary analysis with significators and indication scoring | Answer specific questions via Jyotish |
 | `/varshaphal` | Solar Return: Muntha, Year Lord, Tajaka Yogas | Annual predictions, yearly forecast |
+| `/kp` | KP (Krishnamurti) system: 249 sub-lords, Placidus cusps, four-level significator hierarchy | KP-based precise predictions, sub-lord analysis |
+| `/panchanga/search` | Find dates matching tithi+nakshatra+yoga+vara criteria (unique feature) | Find next Ekadashi on Thursday, specific ritual timing |
+| `/vrata/{year}` | Vrata calendar: Ekadashi, Sankranti, Navaratri, Pradosh, Chaturthi dates | Religious observance planning, fasting calendar |
+| `/remedies` | Personalized planetary remedies: mantras, gemstones, fasting, charity | Remedy recommendations based on birth chart |
 | `/festivals/{year}` | 50+ Hindu festivals with astronomical basis | Festival calendar, cultural event planning |
 
 ## Everyday Use Cases — This API Is All You Need
@@ -114,7 +139,9 @@ that need to deliver authoritative Jyotish readings without any other data sourc
 | **Best time to travel** | `/muhurta` | Nakshatra direction check, vara favorability for safe journey |
 | **Best time to move into a new home** | `/muhurta` | Classical Vastu griha pravesh timing |
 | **Should I take this job?** | `/prashna` | Horary chart — significator analysis, indication score, guidance |
+| **Find a specific auspicious day** | `/panchanga/search` | Search for next date with specific tithi+nakshatra+yoga+vara combination |
 | **Hindu festival dates** | `/festivals/{year}` | Exact dates for Diwali, Holi, Navaratri, Ekadashi, Purnima, and 50+ more |
+| **Vrata/fasting calendar** | `/vrata/{year}` | Complete religious observance calendar with Ekadashi, Sankranti, Navaratri |
 
 ### Personal Insight & Self-Knowledge
 
@@ -178,10 +205,11 @@ that need to deliver authoritative Jyotish readings without any other data sourc
 |----------|-----------|-------------|
 | **Best day for donations (Daan)** | `/panchanga` | Specific tithi/nakshatra/vara for each charity type (Anna Daan on Sunday, Vastra Daan on Monday, etc.) |
 | **Temple visit / puja timing** | `/panchanga` + `/muhurta` | Brahma Muhurta, favorable tithi, nakshatra deity alignment |
-| **When to start a fast (Vrat)** | `/panchanga` | Ekadashi, Pradosh Vrat, Chaturthi, Purnima/Amavasya dates |
+| **When to start a fast (Vrat)** | `/vrata/{year}` | Ekadashi, Pradosh Vrat, Chaturthi, Purnima/Amavasya dates with full calendar |
 | **Maximize karmic benefit of charity** | `/muhurta` | Jupiter Hora on Thursday with benefic yoga |
 | **Shraddha / ancestral rituals** | `/panchanga` | Pitru Paksha dates, Amavasya, lineage-specific tithi |
-| **Planetary remedy timing (Graha Shanti)** | `/transits` + `/panchanga` | When to perform remedies for afflicted planets |
+| **Planetary remedies** | `/remedies` | Personalized mantras, gemstones, fasting days, charity based on birth chart |
+| **Planetary remedy timing (Graha Shanti)** | `/remedies` + `/transits` | Remedies + optimal timing for performing them |
 | **Mantra initiation (Diksha)** | `/muhurta` | Nakshatra aligned with deity, favorable Lagna, strong guru planet |
 | **Start meditation practice** | `/muhurta` | Brahma Muhurta window, Moon in favorable nakshatra, sattvic yoga |
 
@@ -319,7 +347,7 @@ curl -X POST https://api.moon-bot.cc/kundali \
 | 1,000 credits | $30 |
 | 5,000 credits | $150 |
 
-Per-endpoint credit costs: `/panchanga` = 1, `/dasha` = 2, `/kundali` = 3, `/compatibility` = 5, `/festivals/{year}` = 10.
+Per-endpoint credit costs: `/panchanga` = 1, `/dasha` = 2, `/kundali` = 3, `/kp` = 3, `/remedies` = 3, `/panchanga/search` = 5, `/compatibility` = 5, `/vrata/{year}` = 5, `/festivals/{year}` = 10.
 
 ## Payment Methods
 
@@ -372,7 +400,8 @@ Credits are applied automatically after payment confirmation.
 | POST | /panchanga | 1 | Complete Panchanga (5 limbs + times) |
 | GET | /panchanga | 1 | Same via query params |
 | POST | /panchanga/range | 1/day | Multi-day Panchanga |
-| POST | /kundali | 3 | Complete birth chart (Lagna, planets, houses, Navamsha, Dasha, Ashtakavarga, Yogas) |
+| POST | /panchanga/search | 5 | Find dates by panchanga criteria (tithi+nakshatra+yoga+vara) |
+| POST | /kundali | 3 | Complete birth chart (Lagna, planets, houses, Navamsha, Dasha, Ashtakavarga, 300+ Yogas, Doshas) |
 | POST | /dasha | 2 | Vimshottari Dasha (Maha + Antar + Pratyantar) |
 | POST | /compatibility | 5 | Ashtakoot 8-fold matching |
 | POST | /muhurta | 1 | Auspicious timing windows |
@@ -384,6 +413,11 @@ Credits are applied automatically after payment confirmation.
 | POST | /varshaphal | 2 | Tajaka annual predictions |
 | GET | /festivals/{year} | 10 | Hindu festival calendar |
 | GET | /festivals/{year}/{month} | 1 | Monthly festivals |
+| POST | /kp | 3 | KP (Krishnamurti) system: 249 sub-lords, Placidus cusps, significators |
+| POST | /choghadiya | 1 | Choghadiya (8 muhurta divisions) and Hora (planetary hours) |
+| GET | /vrata/{year} | 5 | Vrata/religious observance calendar (Ekadashi, Sankranti, Navaratri) |
+| GET | /vrata/{year}/{month} | 1 | Monthly vrata calendar |
+| POST | /remedies | 3 | Planetary remedies (mantras, gemstones, fasting) based on birth chart |
 | GET | /ephemeris | 1 | Raw planetary positions |
 | POST | /register | free | Get API key (returns polling info for email/TG flows) |
 | GET | /register/status/{account_id} | free | Poll registration status (returns api_key when verified) |
