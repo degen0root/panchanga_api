@@ -1,6 +1,6 @@
 # MCP Integration Guide
 
-PanchangaAPI implements the Model Context Protocol (MCP) via Streamable HTTP transport, making all 16 Vedic astrology tools available to MCP-compatible clients.
+PanchangaAPI implements the Model Context Protocol (MCP) via Streamable HTTP transport, making **22 Vedic astrology tools**, **5 prompt templates**, and **3 resources** available to MCP-compatible clients.
 
 ## Endpoint
 
@@ -9,10 +9,27 @@ POST https://api.moon-bot.cc/mcp
 ```
 
 **Protocol:** JSON-RPC 2.0 over Streamable HTTP
-
+**Protocol Version:** 2024-11-05
 **Authentication:** `X-API-Key` header with your API key
-
 **Session:** Server returns `Mcp-Session-Id` header on `initialize` -- include it in subsequent requests.
+
+---
+
+## Server Capabilities
+
+```json
+{
+  "tools": {},
+  "resources": {},
+  "prompts": {}
+}
+```
+
+| Capability | Count | Description |
+|------------|-------|-------------|
+| Tools | 22 | Vedic astrology calculations + account registration |
+| Prompts | 5 | Pre-built prompt templates for common use cases |
+| Resources | 3 | OpenAPI spec, skill manifest, terms of service |
 
 ---
 
@@ -50,6 +67,20 @@ Add to your Cursor MCP settings (Settings > MCP Servers):
 }
 ```
 
+### Windsurf / Continue / Other MCP Clients
+
+```json
+{
+  "panchanga-api": {
+    "url": "https://api.moon-bot.cc/mcp",
+    "transport": "streamable-http",
+    "headers": {
+      "X-API-Key": "pnc_YOUR_KEY"
+    }
+  }
+}
+```
+
 ### Smithery
 
 Install directly from Smithery:
@@ -58,28 +89,71 @@ Install directly from Smithery:
 
 ---
 
-## Available Tools
+## Available Tools (22)
 
 All tools accept `datetime` (ISO-8601 with timezone), `latitude`, and `longitude` parameters unless noted otherwise.
 
 | Tool Name | Description | Credits |
 |-----------|-------------|---------|
-| `panchanga.daily` | Complete Panchanga -- tithi, nakshatra, yoga, karana, vara, sunrise/sunset | 1 |
-| `panchanga.range` | Multi-day Panchanga for a date range | 1/day |
-| `kundali.birthchart` | Full birth chart -- Lagna, planets, houses, Navamsha, Dasha, Ashtakavarga, Yogas | 3 |
-| `dasha.vimshottari` | Vimshottari Dasha timeline -- Maha + Antar + Pratyantardasha | 2 |
-| `compatibility.ashtakoot` | Ashtakoot 8-fold matching for two birth charts (36-point scale) | 5 |
-| `muhurta.find` | Find ranked auspicious timing windows with quality scores | 1 |
-| `transits.current` | Planetary transits relative to natal Moon, Sade Sati detection | 2 |
-| `vargas.divisional` | All 16 divisional charts (D1 through D60) | 3 |
-| `shadbala.strength` | Six-fold planetary strength with component breakdown | 3 |
-| `bhavachalit.houses` | Bhava Chalit chart with house cusps and planet shifts | 3 |
-| `prashna.horary` | Horary astrology -- significators, indication scoring, guidance | 2 |
-| `varshaphal.annual` | Solar Return -- Muntha, Year Lord, Tajaka Yogas | 2 |
-| `festivals.year` | 50+ Hindu festivals for a given year | 10 |
-| `festivals.month` | Monthly festival calendar | 1 |
-| `ephemeris.positions` | Raw planetary positions at a given time and place | 1 |
-| `account.info` | Check balance, usage, and tier | free |
+| `chart.panchanga` | Complete Panchanga -- tithi, nakshatra, yoga, karana, vara + Rahu Kalam, Yamaganda, Gulika | 1 |
+| `chart.panchanga_range` | Multi-day Panchanga for a date range | 1/day |
+| `chart.panchanga_search` | Search for Panchanga combinations (tithi+nakshatra+yoga+vara criteria) | 5 |
+| `data.ephemeris` | Planetary positions -- longitude, latitude, speed, sign, nakshatra, retrograde | 1 |
+| `chart.kundali` | Full birth chart -- Lagna, 9 grahas, 12 houses, Navamsha, Dasha, Ashtakavarga, 300+ Yogas, Doshas | 3 |
+| `prediction.dasha` | Vimshottari Dasha timeline -- Maha + Antar + Pratyantardasha | 2 |
+| `analysis.compatibility` | Ashtakoot 8-fold matching for two birth charts (36-point scale) | 5 |
+| `analysis.muhurta` | Find ranked auspicious timing windows with quality scores | 1 |
+| `prediction.transits` | Planetary transits relative to natal Moon, Sade Sati detection | 2 |
+| `chart.vargas` | All 16 divisional charts (D1 through D60) | 3 |
+| `analysis.shadbala` | Six-fold planetary strength with component breakdown | 3 |
+| `chart.bhava_chalit` | Bhava Chalit chart with house cusps and planet shifts | 3 |
+| `prediction.prashna` | Horary astrology -- significators, indication scoring, guidance | 2 |
+| `prediction.varshaphal` | Solar Return -- Muntha, Year Lord, Tajaka Yogas | 2 |
+| `data.festivals` | 50+ Hindu festivals for a given year | 10 |
+| `data.festivals_month` | Monthly festival calendar | 1 |
+| `analysis.kp_system` | KP System -- sub-lords, significators, cuspal analysis | 3 |
+| `data.choghadiya` | Choghadiya muhurta divisions + Hora planetary hours | 1 |
+| `data.vrata` | Vrata (fasting) calendar -- Ekadashi, Pradosham, Chaturthi, Amavasya | 5 |
+| `data.vrata_month` | Monthly Vrata calendar | 1 |
+| `analysis.remedies` | Personalized remedies -- gemstones, mantras, rituals based on chart | 3 |
+| `account.register` | Register for an API key (free, email, or Telegram) | free |
+
+### Tool Annotations
+
+All calculation tools include MCP annotations:
+
+```json
+{
+  "readOnlyHint": true,
+  "destructiveHint": false,
+  "idempotentHint": true,
+  "openWorldHint": false
+}
+```
+
+The `account.register` tool has `readOnlyHint: false` and `idempotentHint: false` since it creates state.
+
+---
+
+## Prompts (5)
+
+| Prompt | Arguments | Description |
+|--------|-----------|-------------|
+| `daily_horoscope` | date, latitude, longitude | Generate a daily Vedic horoscope |
+| `birth_chart_reading` | birth_datetime, latitude, longitude | Complete Kundali interpretation |
+| `compatibility_check` | person1_datetime, person2_datetime, latitude, longitude | Ashtakoot marriage matching |
+| `auspicious_timing` | event_type, after_date, latitude, longitude | Find best Muhurta for an event |
+| `setup_x402_payments` | (none) | Guide for enabling x402 USDC auto-payments |
+
+---
+
+## Resources (3)
+
+| URI | Name | MIME Type |
+|-----|------|-----------|
+| `https://api.moon-bot.cc/openapi.json` | OpenAPI Specification | application/json |
+| `https://api.moon-bot.cc/static/SKILL.md` | Skill Manifest | text/markdown |
+| `https://api.moon-bot.cc/terms` | Terms of Service | text/html |
 
 ---
 
@@ -93,7 +167,7 @@ All tools accept `datetime` (ISO-8601 with timezone), `latitude`, and `longitude
   "id": 1,
   "method": "initialize",
   "params": {
-    "protocolVersion": "2025-03-26",
+    "protocolVersion": "2024-11-05",
     "capabilities": {},
     "clientInfo": {
       "name": "my-client",
@@ -103,7 +177,18 @@ All tools accept `datetime` (ISO-8601 with timezone), `latitude`, and `longitude
 }
 ```
 
-### 2. List Tools
+Response includes `Mcp-Session-Id` header.
+
+### 2. Send Initialized Notification
+
+```json
+{
+  "jsonrpc": "2.0",
+  "method": "notifications/initialized"
+}
+```
+
+### 3. List Tools
 
 ```json
 {
@@ -113,17 +198,37 @@ All tools accept `datetime` (ISO-8601 with timezone), `latitude`, and `longitude
 }
 ```
 
-### 3. Call a Tool
+### 4. List Prompts
 
 ```json
 {
   "jsonrpc": "2.0",
   "id": 3,
+  "method": "prompts/list"
+}
+```
+
+### 5. List Resources
+
+```json
+{
+  "jsonrpc": "2.0",
+  "id": 4,
+  "method": "resources/list"
+}
+```
+
+### 6. Call a Tool
+
+```json
+{
+  "jsonrpc": "2.0",
+  "id": 5,
   "method": "tools/call",
   "params": {
-    "name": "panchanga.daily",
+    "name": "chart.panchanga",
     "arguments": {
-      "datetime": "2026-03-15T06:00:00+05:30",
+      "datetime": "2026-03-16T06:00:00+05:30",
       "latitude": 28.6139,
       "longitude": 77.2090
     }
@@ -131,11 +236,18 @@ All tools accept `datetime` (ISO-8601 with timezone), `latitude`, and `longitude
 }
 ```
 
----
+### 7. Get a Prompt
 
-## Prompts
-
-The server exposes an `x402-setup` prompt via `prompts/list` and `prompts/get` that explains the x402 USDC auto-payment flow for agents with crypto wallets.
+```json
+{
+  "jsonrpc": "2.0",
+  "id": 6,
+  "method": "prompts/get",
+  "params": {
+    "name": "setup_x402_payments"
+  }
+}
+```
 
 ---
 
