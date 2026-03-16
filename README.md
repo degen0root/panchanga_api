@@ -2,9 +2,11 @@
 
 # PanchangaAPI
 
-**Vedic Astrology API & MCP Server — 16 tools, Swiss Ephemeris precision**
+**Vedic Astrology API & MCP Server — 19 tools, Swiss Ephemeris precision**
 
 The most accurate and complete Vedic astrology (Jyotish) API available. Purpose-built for AI agents, developers, and astro-applications. Swiss Ephemeris engine with Lahiri ayanamsha, sidereal zodiac, and true planetary positions.
+
+**v4.0** — KP System, 300+ Yogas, Panchanga Search, Vrata Calendar, Remedies, and Ashtakavarga.
 
 ---
 
@@ -43,10 +45,12 @@ curl -X POST https://api.moon-bot.cc/panchanga \
 
 | Method | Path | Credits | Description |
 |--------|------|---------|-------------|
-| POST | `/panchanga` | 1 | Complete Panchanga -- tithi, nakshatra, yoga, karana, vara + sunrise/sunset |
+| POST | `/panchanga` | 1 | Complete Panchanga -- tithi, nakshatra, yoga, karana, vara + inauspicious periods (Rahu Kalam, Yamaganda, Gulika) |
 | GET | `/panchanga` | 1 | Same via query parameters |
 | POST | `/panchanga/range` | 1/day | Multi-day Panchanga |
-| POST | `/kundali` | 3 | Full birth chart -- Lagna, 9 planets, 12 houses, Navamsha, Dasha, Ashtakavarga, Yogas |
+| POST | `/panchanga/search` | 5 | **NEW** Search for specific Panchanga combinations (tithi+nakshatra+yoga) within a date range |
+| POST | `/kundali` | 3 | Full birth chart -- Lagna, 9 planets, 12 houses, Navamsha, Dasha, Ashtakavarga, 300+ Yogas, Doshas |
+| POST | `/kp` | 3 | **NEW** KP (Krishnamurthy Paddhati) System -- sub-lords, significators, cuspal analysis |
 | POST | `/dasha` | 2 | Vimshottari Dasha -- Maha + Antar + Pratyantardasha with exact date ranges |
 | POST | `/compatibility` | 5 | Ashtakoot 8-fold matching (36-point scale) |
 | POST | `/muhurta` | 1 | Ranked auspicious timing windows with quality scores |
@@ -56,8 +60,10 @@ curl -X POST https://api.moon-bot.cc/panchanga \
 | POST | `/bhava-chalit` | 3 | Bhava Chalit chart with house cusps and planet shifts |
 | POST | `/prashna` | 2 | Horary (Prashna) astrology -- significators and indication scoring |
 | POST | `/varshaphal` | 2 | Solar Return -- Muntha, Year Lord, Tajaka Yogas |
+| POST | `/remedies` | 3 | **NEW** Personalized remedies -- gemstones, mantras, rituals based on chart weaknesses |
 | GET | `/festivals/{year}` | 10 | 50+ Hindu festivals with astronomical basis |
 | GET | `/festivals/{year}/{month}` | 1 | Monthly festival calendar |
+| GET | `/vrata/{year}` | 5 | **NEW** Vrata (fasting) calendar -- Ekadashi, Pradosham, Chaturthi, Amavasya, Purnima |
 | GET | `/ephemeris` | 1 | Raw planetary positions |
 
 All calculation endpoints accept:
@@ -72,9 +78,24 @@ All calculation endpoints accept:
 
 ---
 
+## What's New in v4.0
+
+- **KP System (`/kp`)** -- Krishnamurthy Paddhati with sub-lord theory, significators, and ruling planets
+- **300+ Yogas** -- Pancha Mahapurusha, Dhana, Raja, Daridra, Nabhas, and more detected in `/kundali`
+- **Panchanga Search (`/panchanga/search`)** -- Find dates matching specific tithi, nakshatra, yoga combinations
+- **Vrata Calendar (`/vrata/{year}`)** -- Complete fasting calendar with Ekadashi, Pradosham, Chaturthi dates
+- **Remedies (`/remedies`)** -- Chart-based gemstone, mantra, and ritual recommendations
+- **Ashtakavarga** -- Full Sarvashtakavarga and Prastarashtakavarga in Kundali output
+- **Dosha Detection** -- Manglik, Kaal Sarp, Pitra, Grahan doshas in Kundali
+- **Inauspicious Periods** -- Rahu Kalam, Yamaganda, Gulika Kalam in Panchanga
+- **19 MCP tools** -- All endpoints available via MCP Streamable HTTP
+- **425 tests** -- Comprehensive test coverage
+
+---
+
 ## MCP Integration
 
-PanchangaAPI is available as an MCP server for Claude Desktop, Cursor, and other MCP-compatible clients.
+PanchangaAPI is available as an MCP server for Claude Desktop, Cursor, and other MCP-compatible clients. **19 tools** covering all Vedic astrology calculations.
 
 **Smithery:** [smithery.ai/servers/panchanga/api](https://smithery.ai/servers/panchanga/api)
 
@@ -163,13 +184,15 @@ Credits are applied automatically after payment confirmation.
 ## Use Cases
 
 - **Daily horoscopes** -- Panchanga for tithi, nakshatra, yoga, karana
-- **Birth chart readings** -- Full Kundali with Yogas, Dasha, Ashtakavarga
+- **Birth chart readings** -- Full Kundali with 300+ Yogas, Dasha, Ashtakavarga
 - **Compatibility matching** -- Ashtakoot 8-fold scoring for relationships
 - **Event timing** -- Muhurta for weddings, business launches, travel
 - **Annual predictions** -- Varshaphal with Tajaka Yogas
+- **KP astrology** -- Sub-lord based predictions and ruling planet analysis
 - **Financial astrology** -- Transit-based market signals, Dasha cycle analysis
 - **Sports prediction** -- Prashna horary for event outcomes
-- **Festival calendars** -- 50+ Hindu festivals with precise astronomical dates
+- **Festival & Vrata calendars** -- Hindu festivals and fasting dates with precise astronomical timing
+- **Remedial astrology** -- Personalized gemstone, mantra, and ritual recommendations
 
 ---
 
