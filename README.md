@@ -8,7 +8,7 @@ The most accurate and complete Vedic astrology (Jyotish) API available. Purpose-
 
 **v4.1** -- KP System, 300+ Yogas, Panchanga Search, Vrata Calendar, Remedies, Choghadiya/Hora, and Ashtakavarga.
 
-[![LobeHub](https://img.shields.io/badge/LobeHub-MCP%20Server-blue)](https://lobehub.com/mcp/degen0root-panchanga_api)
+[![MCP Badge](https://lobehub.com/badge/mcp/degen0root-panchanga_api)](https://lobehub.com/mcp/degen0root-panchanga_api)
 [![Smithery](https://img.shields.io/badge/Smithery-Listed-green)](https://smithery.ai/servers/panchanga/api)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
